@@ -11,7 +11,7 @@ This Terraform provider enables create, read, update, delete, and import operati
 
 ## Application Account
 
-### Setup<a id="setup"></a>]
+### Setup<a id="setup"></a>
 1. Create a Miro account. (https://miro.com/signup/)
 2. And Sign in to the Miro.
 3. Follow the link create app. (https://developers.miro.com/docs/getting-started#section-step-1-get-developer-team)
