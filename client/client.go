@@ -83,7 +83,7 @@ func init() {
 	Errors[409] = "User Already Exist, StatusCode = 409"
 	Errors[429] = "User has sent too Many Requests, StatusCode = 429"
 	Errors[500] = "Internal Server Error = 500"
-}
+} 
 
 func NewClient(token string,team_id string) *Client {
 	return &Client{

@@ -12,12 +12,12 @@ func Provider() *schema.Provider {
 				Type:      schema.TypeString,
 				Required:  true,
 				Sensitive: true,
-				//DefaultFunc: schema.EnvDefaultFunc("MIRO_TOKEN", ""),
+				DefaultFunc: schema.EnvDefaultFunc("MIRO_TOKEN", ""),
 			}, 
 			"miro_team_id": &schema.Schema{
 				Type:      schema.TypeString,
 				Required:  true,
-				//DefaultFunc: schema.EnvDefaultFunc("MIRO_TEAM_ID", ""),
+				DefaultFunc: schema.EnvDefaultFunc("MIRO_TEAM_ID", ""),
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{

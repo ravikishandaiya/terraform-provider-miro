@@ -113,8 +113,7 @@ func resourceUserCreate(ctx context.Context,d *schema.ResourceData, m interface{
 func resourceUserRead(ctx context.Context,d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	apiClient 	:= m.(*client.Client)
-	email 		:= d.Id()
-	//resp, err 	:= apiClient.GetUser(email)
+	email 		:= d.Get("email").(string)
 	retryErr := resource.Retry(2*time.Second, func() *resource.RetryError {
 		resp, err := apiClient.GetUser(email)
 		if err != nil {
@@ -158,7 +157,6 @@ func resourceUserUpdate(ctx context.Context,d *schema.ResourceData, m interface{
 	}
 	email := d.Get("email").(string)
 	role := d.Get("role").(string)
-	//err := apiClient.UpdateUser(email, role)
 	var err error
 	retryErr := resource.Retry(2*time.Second, func() *resource.RetryError {
 		if err = apiClient.UpdateUser(email, role); err != nil {
