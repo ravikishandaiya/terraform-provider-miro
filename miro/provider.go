@@ -8,14 +8,16 @@ import (
 func Provider() *schema.Provider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"token": &schema.Schema{
+			"miro_token": &schema.Schema{
 				Type:      schema.TypeString,
-				Optional:  true,
+				Required:  true,
 				Sensitive: true,
+				//DefaultFunc: schema.EnvDefaultFunc("MIRO_TOKEN", ""),
 			}, 
-			"team_id": &schema.Schema{
+			"miro_team_id": &schema.Schema{
 				Type:      schema.TypeString,
-				Optional:  true,
+				Required:  true,
+				//DefaultFunc: schema.EnvDefaultFunc("MIRO_TEAM_ID", ""),
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
@@ -29,7 +31,7 @@ func Provider() *schema.Provider {
 }
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
-	token 	:= d.Get("token").(string)
-	team_id := d.Get("team_id").(string)
-	return client.NewClient(token, team_id), nil
+	miroToken 	:= d.Get("miro_token").(string)
+	miroTeam_id := d.Get("miro_team_id").(string)
+	return client.NewClient(miroToken, miroTeam_id), nil
 }

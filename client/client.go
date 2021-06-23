@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"io/ioutil"
+	"strings"
 )
 
 type createUserRequest struct {
@@ -57,7 +58,9 @@ type getUserStruct struct {
 	Type	string	`json:"type"`
 	ID		string	`json:"id"`
 	Name	string	`json:"name"`
+	Industry	string	`json:"industry"`
 	CreatedAt	string	`json:"createdAt"`
+	Company		string	`json:"company"`
 	Role	string	`json:"role"`
 	TeamName	string
 	Email	string	`json:"email"`
@@ -74,22 +77,12 @@ var (
 
 func init() {
 	Errors[400] = "Bad Request, StatusCode = 400"
-	Errors[404] = "User Does Not Exist , StatusCode = 404"
-	Errors[409] = "User Already Exist, StatusCode = 409"
 	Errors[401] = "Unautharized Access, StatusCode = 401"
-	Errors[429] = "User Has Sent Too Many Request, StatusCode = 429"
-	Errors[500] = "Internal Server Error"
-	
-	Errors[501] = "Not Implemented"
-	Errors[502] = "Bad Gateway"
-	Errors[503] = "Service Unavailable"
-	Errors[504] = "Gateway Timeout"
-	Errors[505] = "HTTP Version Not Supported"
-	Errors[506] = "Variant Also Negotiates"
-	Errors[507] = "Insufficient Storage"
-	Errors[508] = "Loop Detected"
-	Errors[510] = "Not Extended"
-	Errors[511] = "Network Authentication Required"
+	Errors[403] = "insufficientPermissions, StatusCode = 403"
+	Errors[404] = "User Not Found, StatusCode = 404"
+	Errors[409] = "User Already Exist, StatusCode = 409"
+	Errors[429] = "User has sent too Many Requests, StatusCode = 429"
+	Errors[500] = "Internal Server Error = 500"
 }
 
 func NewClient(token string,team_id string) *Client {
@@ -98,6 +91,15 @@ func NewClient(token string,team_id string) *Client {
 		team_id:	team_id,
 		httpClient: &http.Client{},
 	}
+}
+
+func (c *Client) IsRetry(err error) bool {
+	if err != nil {
+		if strings.Contains(err.Error(), "429")==true {
+			return true
+		}
+	}
+	return false
 }
 
 func (c *Client) handleRequest(httpMethod string,url string, body []byte) (responce *http.Response, err error) {
@@ -143,7 +145,7 @@ func (c *Client) CreateUser(email string) (error) {
 func (c *Client) getAllTeamMembers() ([] data, []string, error) {
 	var list []string
 	var ResponceStruct listAllUserResponce
-	url := fmt.Sprintf("https://api.miro.com/v1/teams/%s/user-connections?limit=10&offset=0", c.team_id)
+	url := fmt.Sprintf("https://api.miro.com/v1/teams/%s/user-connections?limit=100&offset=0", c.team_id)
 	resp,err := c.handleRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return ResponceStruct.Data,list,err
@@ -236,11 +238,14 @@ func (c *Client) UpdateUser(email string, role string) (error) {
 
 func (c *Client) DeleteUser(email string) (error) {
 	user_id, err := c.Get_User_ID(email)
+	fmt.Print("User: ",user_id)
 	if err != nil {
 		return err
 	}
+	fmt.Print("checkpoiint 2.")
 	url := fmt.Sprintf("https://api.miro.com/v1/team-user-connections/%s",user_id)
 	resp ,err := c.handleRequest(http.MethodDelete, url, nil)
+	fmt.Print(resp.StatusCode)
 	if resp.StatusCode != 204 {
 		return  fmt.Errorf("%s",Errors[resp.StatusCode])
 	}
