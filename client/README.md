@@ -3,7 +3,7 @@
 This folder contains two files <strong>client.go</strong> and <strong>client_test.go</strong>
 
 ### Client.go
-    This is client library file of zoom api which contains all the functions to call all the four methods ie. CRUD
+    This is client library file of Miro api which contains all the functions to call all the four methods ie. CRUD
 
 ### Client_test.go
 
