@@ -1,6 +1,7 @@
 package miro
 
 import (
+	"fmt"
 	"terraform-provider-miro/client"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -33,5 +34,8 @@ func Provider() *schema.Provider {
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	miroToken 	:= d.Get("miro_token").(string)
 	miroTeam_id := d.Get("miro_team_id").(string)
+	if len(miroToken) == 0 || len(miroTeam_id) == 0 {
+		return client.NewClient(miroToken, miroTeam_id), fmt.Errorf("Token or Team ID is not provided.")
+	}
 	return client.NewClient(miroToken, miroTeam_id), nil
 }

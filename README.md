@@ -89,7 +89,7 @@ Add `data` and `output` blocks as shown in the [example usage](#example-usage) a
 Delete the `resource` block of the user and run `terraform apply`.
 
 ### Import a User Data
-1. Write manually a resource configuration block for the User in `main.tf` as shown in [example usage](#example-usage).
+1. Write manually a resource configuration block for the User as shown in [example usage](#example-usage).
 2. Run the command `terraform import miro_user.user1 [EMAIL_ID]`
 3. Check for the attributes in the `.tfstate` file and fill them accordingly in resource block.
 
@@ -132,7 +132,7 @@ output "user2" {
 * `miro_token` (Required, String) - Miro provde access token for authentication which we have already seen how to get access_token.
 * `miro_team_id` (Required, String) - It's a an ID associated with for team, It can be get from profile page.
 * `email` (Required, String) - Email is user's mail id who is a part of team or going to be a part of team.
-* `role` (Optional, string) - Role is user's role in the team it can be admin, member or non_team.
+* `role` (Optional, string) - Role is user's role in the team it can be admin or member.
 
 ## Exceptions
 
@@ -141,4 +141,4 @@ output "user2" {
 * The role of the last administrator for your team cannot be changed.
 * If the removed user owns any boards or projects, they also will be removed.
 In case you want to save them, you need to reassign ownership first.
-* Last team memer(which would be admin) can't be removed.
+* Last team member(which would be admin) can't be removed.

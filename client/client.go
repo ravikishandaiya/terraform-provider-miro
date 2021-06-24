@@ -116,6 +116,9 @@ func (c *Client) handleRequest(httpMethod string,url string, body []byte) (respo
 	if err != nil {
 		return 
 	}
+	if responce.StatusCode < 200 || responce.StatusCode >= 299 {
+		return responce, fmt.Errorf("Error : %v",Errors[responce.StatusCode])
+	}
 	return
 }
 

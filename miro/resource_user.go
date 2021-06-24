@@ -211,10 +211,7 @@ func resourceUserImporter(ctx context.Context, d *schema.ResourceData, m interfa
 	email     := d.Id()
 	resp, err := apiClient.GetUser(email)
 	if err != nil {
-		if strings.Contains(err.Error(), "User Not Found") {
-			d.SetId("")
-			return nil, err
-		}
+		return nil, err
 	}
 	d.Set("email",resp.Email)
 	d.Set("type",resp.Type)
