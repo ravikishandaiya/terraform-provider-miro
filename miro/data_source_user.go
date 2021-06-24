@@ -12,28 +12,33 @@ func dataSourceUser() *schema.Resource {
 		Read:   dataSourceUserRead,
 		Schema: map[string]*schema.Schema{
 			"email": &schema.Schema{
-				Type:        schema.TypeString,
+				Type:        schema.TypeString, 
 				Required:    true,
 			},
 			"role": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:	 true,
 			},
 			"type":	&schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:	 true,
 			},
 			"name": &schema.Schema{
-				Type:        schema.TypeString, 
+				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:	 true,
 			},
 			"team_name": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:	 true,
 			},
 			"created_at": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:	 true,
 			},
 			"industry":  &schema.Schema{
 				Type:        schema.TypeString,
@@ -43,14 +48,12 @@ func dataSourceUser() *schema.Resource {
 			"company": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:	 true,
 			},
 			"state": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
-			},
-			"image_url": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    true,
+				Computed:	 true,
 			},
 		},
 	}	

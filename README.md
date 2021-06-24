@@ -78,7 +78,8 @@ mkdir -p %APPDATA%/Roaming/terraform.d/plugins/hashicorp.com/edu/miro/0.3/window
 5. Set the account using invitation.
 
 ### Update the user
-Update the data of the user in the `main.tf` file (in this case only role can be updated.)
+Update the data of the user in the respective field in `resource` block as shown in [example usage](#example-usage).
+(in this case only role can be updated.)
 And apply using `terraform apply`
 
 ### Read the User Data
@@ -88,7 +89,7 @@ Add `data` and `output` blocks as shown in the [example usage](#example-usage) a
 Delete the `resource` block of the user and run `terraform apply`.
 
 ### Import a User Data
-1. Write manually a resource configuration block for the User in `main.tf`, to which the imported object will be mapped.
+1. Write manually a resource configuration block for the User in `main.tf` as shown in [example usage](#example-usage).
 2. Run the command `terraform import miro_user.user1 [EMAIL_ID]`
 3. Check for the attributes in the `.tfstate` file and fill them accordingly in resource block.
 

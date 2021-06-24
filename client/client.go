@@ -238,14 +238,11 @@ func (c *Client) UpdateUser(email string, role string) (error) {
 
 func (c *Client) DeleteUser(email string) (error) {
 	user_id, err := c.Get_User_ID(email)
-	fmt.Print("User: ",user_id)
 	if err != nil {
 		return err
 	}
-	fmt.Print("checkpoiint 2.")
 	url := fmt.Sprintf("https://api.miro.com/v1/team-user-connections/%s",user_id)
 	resp ,err := c.handleRequest(http.MethodDelete, url, nil)
-	fmt.Print(resp.StatusCode)
 	if resp.StatusCode != 204 {
 		return  fmt.Errorf("%s",Errors[resp.StatusCode])
 	}

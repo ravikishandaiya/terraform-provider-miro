@@ -40,6 +40,7 @@ func resourceUser() *schema.Resource {
 			"role": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:	 true,
 			},
 			"type":	&schema.Schema{
 				Type:        schema.TypeString,
@@ -72,11 +73,6 @@ func resourceUser() *schema.Resource {
 				Computed:	 true,
 			},
 			"state": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:	 true,
-			},
-			"image_url": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:	 true,
@@ -220,7 +216,7 @@ func resourceUserImporter(ctx context.Context, d *schema.ResourceData, m interfa
 			return nil, err
 		}
 	}
-	d.SetId(resp.Email)
+	d.Set("email",resp.Email)
 	d.Set("type",resp.Type)
 	d.Set("name",resp.Name)
 	d.Set("team_name",resp.TeamName)
