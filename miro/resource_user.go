@@ -102,6 +102,7 @@ func resourceUserCreate(ctx context.Context,d *schema.ResourceData, m interface{
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	d.SetId(email)
 	resourceUserRead(ctx,d,m)
 	return diags
 }
@@ -109,7 +110,7 @@ func resourceUserCreate(ctx context.Context,d *schema.ResourceData, m interface{
 func resourceUserRead(ctx context.Context,d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	apiClient 	:= m.(*client.Client)
-	email 		:= d.Get("email").(string)
+	email 		:= d.Id()
 	retryErr := resource.Retry(2*time.Second, func() *resource.RetryError {
 		resp, err := apiClient.GetUser(email)
 		if err != nil {
@@ -118,7 +119,6 @@ func resourceUserRead(ctx context.Context,d *schema.ResourceData, m interface{})
 			}
 			return resource.NonRetryableError(err)
 		}
-		d.SetId(resp.Email)
 		d.Set("type",resp.Type)
 		d.Set("email",resp.Email)
 		d.Set("name",resp.Name)
@@ -151,7 +151,7 @@ func resourceUserUpdate(ctx context.Context,d *schema.ResourceData, m interface{
 		})
 		return diags
 	}
-	email := d.Get("email").(string)
+	email := d.Id()
 	role := d.Get("role").(string)
 	var err error
 	retryErr := resource.Retry(2*time.Second, func() *resource.RetryError {
@@ -176,14 +176,6 @@ func resourceUserUpdate(ctx context.Context,d *schema.ResourceData, m interface{
 func resourceUserDelete(ctx context.Context,d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	apiClient := m.(*client.Client)
-	if d.HasChange("email") {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "User not allowed to change email",
-			Detail:   "User not allowed to change email",
-		})
-		return diags
-	}
 	email := d.Id()
 	var err error
 	retryErr := resource.Retry(2*time.Second, func() *resource.RetryError {
