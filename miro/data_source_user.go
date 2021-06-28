@@ -15,6 +15,10 @@ func dataSourceUser() *schema.Resource {
 				Type:        schema.TypeString, 
 				Required:    true,
 			},
+			"team_id": &schema.Schema{
+				Type:        schema.TypeString, 
+				Required:    true,
+			},
 			"role": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -62,7 +66,8 @@ func dataSourceUser() *schema.Resource {
 func dataSourceUserRead(d *schema.ResourceData, m interface{})  error  {
 	apiClient := m.(*client.Client)
 	email     := d.Get("email").(string)
-	resp, err := apiClient.GetUser(email)
+	team_id	  := d.Get("team_id").(string)
+	resp, err := apiClient.GetUser(email, team_id)
 	if err != nil {
 		if strings.Contains(err.Error(), "User Not Found") {
 			d.SetId("")

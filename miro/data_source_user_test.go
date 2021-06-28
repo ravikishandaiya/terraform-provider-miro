@@ -14,10 +14,8 @@ func TestAccUserDataSource_basic(t *testing.T) {
 			{
 				Config: testAccUserDataSourceConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr(
-						"data.miro_user.user2", "team_id", ""),
-					resource.TestCheckResourceAttr(
-						"data.miro_user.user2", "id", ""),
+					resource.TestCheckResourceAttr("data.miro_user.user3", "email", "{USER EMAIL}"),
+					resource.TestCheckResourceAttr("data.miro_user.user3", "team_id", "{TEAM ID}"),
 				),
 			},
 		},
@@ -27,12 +25,13 @@ func TestAccUserDataSource_basic(t *testing.T) {
 func testAccUserDataSourceConfig() string {
 	return fmt.Sprintf(`	  
 	resource "miro_user" "user2" {
-		email        = ""
-		team_id		 = ""
+		email        = "{USER EMAIL}"
+		role		 = "{ROLE}"
+		team_id		 = "{TEAM ID}"
 	  }
-	data "miro_user" "user1" {
-		email        = ""
-		team_id		 = ""
+	data "miro_user" "user3" {
+		email        = "{USER EMAIL}"
+		team_id		 = "{TEAM ID}"
 	}
 	`)
 }

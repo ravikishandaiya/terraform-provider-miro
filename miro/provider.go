@@ -14,11 +14,6 @@ func Provider() *schema.Provider {
 				Required:  true,
 				Sensitive: true,
 				DefaultFunc: schema.EnvDefaultFunc("MIRO_TOKEN", ""),
-			}, 
-			"miro_team_id": &schema.Schema{
-				Type:      schema.TypeString,
-				Required:  true,
-				DefaultFunc: schema.EnvDefaultFunc("MIRO_TEAM_ID", ""),
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
@@ -33,9 +28,8 @@ func Provider() *schema.Provider {
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	miroToken 	:= d.Get("miro_token").(string)
-	miroTeam_id := d.Get("miro_team_id").(string)
-	if len(miroToken) == 0 || len(miroTeam_id) == 0 {
-		return client.NewClient(miroToken, miroTeam_id), fmt.Errorf("Token or Team ID is not provided.")
+	if len(miroToken) == 0 {
+		return client.NewClient(miroToken), fmt.Errorf("Token not provided.")
 	}
-	return client.NewClient(miroToken, miroTeam_id), nil
+	return client.NewClient(miroToken), nil
 }

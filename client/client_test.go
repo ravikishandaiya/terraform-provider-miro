@@ -7,50 +7,55 @@ import(
 )
 
 func init(){
-	token := "{api token}"
-	team_id := "{team ID}"
+	token := "{MIRO_TOKEN}"
 	os.Setenv("MIRO_TOKEN", token)
-	os.Setenv("TEAM_ID",team_id)
 }
 
 func TestClient_GetUser(t *testing.T) {
 	testCases := []struct {
 		testName     string
 		userName     string
+		team_id	     string
 		seedData     map[string]getUserStruct
 		expectErr    bool
 		expectedResp getUserStruct
 	}{
 		{
 			testName: "user exists",
-			userName: "{email}",
+			userName: "{USER's EMAIL}",
+			team_id:  "{MIRO_TEAM_ID}",
 			seedData: map[string]getUserStruct{
 				"user1": {
 					Type:		"user",
 					ID:			"{USER ID}",
 					Name:		"{USER NAME}",
-					CreatedAt:	"{DATE}",
+					Industry:	"{INDUSTRY}",
+					CreatedAt:	"{CREATED AT}",
+					Company:	"{COMPANY}",
 					Role:		"{ROLE}",
 					TeamName:	"{TEAM NAME}",
 					Email:		"{EMAIL}",
-					State:		"registered",
+					State:		"{STATE}",
 				},
 			},
 			expectErr: false,
 			expectedResp: getUserStruct{
-				Type:		"user",
-				ID:			"{USER ID}",
-				Name:		"{USER NAME}",
-				CreatedAt:	"{DATE}",
-				Role:		"{ROLE}",
-				TeamName:	"{TEAM NAME}",
-				Email:		"{EMAIL}",
-				State:		"registered",
+					Type:		"user",
+					ID:			"{USER ID}",
+					Name:		"{USER NAME}",
+					Industry:	"{INDUSTRY}",
+					CreatedAt:	"{CREATED AT}",
+					Company:	"{COMPANY}",
+					Role:		"{ROLE}",
+					TeamName:	"{TEAM NAME}",
+					Email:		"{EMAIL}",
+					State:		"{STATE}",
 			},
 		},
 			{
 			testName:     "user does not exist",
-			userName:     "{email of user wwho  doesn't exist in team}",
+			userName:     "{USER's EMAIL ID}",
+			team_id:      "{TEAM ID}",
 			seedData:     nil,
 			expectErr:    true,
 			expectedResp: getUserStruct{},
@@ -60,8 +65,8 @@ func TestClient_GetUser(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.testName, func(t *testing.T) {
-			client 		:= NewClient(os.Getenv("MIRO_TOKEN"),os.Getenv("TEAM_ID"))
-			item, err 	:= client.GetUser(tc.userName)
+			client 		:= NewClient(os.Getenv("MIRO_TOKEN"))
+			item, err 	:= client.GetUser(tc.userName, tc.team_id)
 			if tc.expectErr {
 				assert.Error(t, err)
 				return
@@ -75,27 +80,30 @@ func TestClient_CreateUser(t *testing.T) {
 	testCases :=  []struct {
 		testName  string
 		newUser   string
+		team_id   string
 		seedData  map[string]string
 		expectErr bool
 	}{
 		{
 			testName: "success",
-			newUser:  "{mail of new user}",
+			newUser:  "{EMAIL}",
+			team_id:  "{TEAM ID}",
 			seedData:  nil,
 			expectErr: false,
 		},
 		{
 			testName: "user already exists",
-			newUser:  "{user's email, who exist in the team}",
-			seedData:  map[string]string {"user1": "{email}"},
+			newUser:  "{EMAIL}",
+			team_id:  "{TEAM ID}",
+			seedData:  map[string]string {"user1": "{EMAIL}"},
 			expectErr: true,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.testName, func(t *testing.T) {
-			client 	:= NewClient( os.Getenv("MIRO_TOKEN"), os.Getenv("TEAM_ID"))
-			err 	:= client.CreateUser(tc.newUser)
+			client 	:= NewClient( os.Getenv("MIRO_TOKEN"))
+			err 	:= client.CreateUser(tc.newUser, tc.team_id)
 			if tc.expectErr {
 				assert.Error(t, err)
 				return
@@ -109,23 +117,26 @@ func TestClient_UpdateUser(t *testing.T) {
 	testCases := []struct {
 		testName    string
 		role		string
+		team_id		string
 		seedData    map[string]string
 		expectErr   bool
 		email		string
 	}{
 		{
 			testName: "user exists",
-			role:	  "{role}",
-			email:	  "{email}",
+			role:	  "{ROLE}",
+			team_id:  "{MIRO TEAM ID}",
+			email:	  "{EMAIL}",
 			seedData: map[string]string{
-				"user1": "{user ID}",
+				"user1": "{USER ID}",
 			},
 			expectErr: false,
 		},
 		{
 			testName: "user does not exist",
-			role:	  "{role}",
-			email:	  "{email}",
+			role:	  "admin",
+			team_id:  "{MIRO TEAM ID}",
+			email:	  "{EMAIL}",
 			seedData:  nil,
 			expectErr: true,
 		},
@@ -133,13 +144,13 @@ func TestClient_UpdateUser(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.testName, func(t *testing.T) {
-			client := NewClient(os.Getenv("MIRO_TOKEN"),os.Getenv("TEAM_ID"))
-			err    := client.UpdateUser(tc.email,tc.role)
+			client := NewClient(os.Getenv("MIRO_TOKEN"))
+			err    := client.UpdateUser(tc.email, tc.role, tc.team_id)
 			if tc.expectErr {
 				assert.Error(t, err)
 				return
 			}
-			user, err := client.GetUser(tc.email)
+			user, err := client.GetUser(tc.email, tc.team_id)
 			assert.NoError(t, err)
 			assert.Equal(t, tc.role, user.Role)
 		})
@@ -150,22 +161,24 @@ func TestClient_DeleteUser(t *testing.T) {
 	testCases := []struct {
 		testName  string
 		user	  string
+		team_id   string
 		seedData  map[string]string
 		expectErr bool
 	}{
 		{
 			testName: "user exists",
-			user:     "{email}",
+			user:     "{EMAIL ID}",
+			team_id:  "{TEAM ID}",
 			seedData: map[string]string{
-				"user1": "{user id}",
+				"user1": "{USER ID}",
 			},
 			expectErr: false,
 		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.testName, func(t *testing.T) {
-			client 		:= NewClient(os.Getenv("MIRO_TOKEN"),os.Getenv("TEAM_ID"))
-			err := client.DeleteUser(tc.user)
+			client 		:= NewClient(os.Getenv("MIRO_TOKEN"))
+			err := client.DeleteUser(tc.user, tc.team_id)
 			if err != nil {
 				assert.NoError(t,err)
 			}

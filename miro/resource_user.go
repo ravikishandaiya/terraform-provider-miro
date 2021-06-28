@@ -37,6 +37,10 @@ func resourceUser() *schema.Resource {
 				Required:    true,
 				ValidateFunc: validateEmail,
 			},
+			"team_id": &schema.Schema{
+				Type:        schema.TypeString, 
+				Required:    true,
+			},
 			"role": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -85,9 +89,10 @@ func resourceUserCreate(ctx context.Context,d *schema.ResourceData, m interface{
 	var diags diag.Diagnostics
 	apiClient 	:= m.(*client.Client)
 	email 		:= d.Get("email").(string)
+	team_id		:= d.Get("team_id").(string)
 	var err error
 	retryErr := resource.Retry(2*time.Second, func() *resource.RetryError {
-		if err = apiClient.CreateUser(email); err != nil {
+		if err = apiClient.CreateUser(email, team_id); err != nil {
 			if apiClient.IsRetry(err) {
 				return resource.RetryableError(err)
 			}
@@ -102,7 +107,6 @@ func resourceUserCreate(ctx context.Context,d *schema.ResourceData, m interface{
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	d.SetId(email)
 	resourceUserRead(ctx,d,m)
 	return diags
 }
@@ -110,15 +114,17 @@ func resourceUserCreate(ctx context.Context,d *schema.ResourceData, m interface{
 func resourceUserRead(ctx context.Context,d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	apiClient 	:= m.(*client.Client)
-	email 		:= d.Id()
+	email 		:= d.Get("email").(string)
+	team_id		:= d.Get("team_id").(string)
 	retryErr := resource.Retry(2*time.Second, func() *resource.RetryError {
-		resp, err := apiClient.GetUser(email)
+		resp, err := apiClient.GetUser(email, team_id)
 		if err != nil {
 			if apiClient.IsRetry(err) {
 				return resource.RetryableError(err)
 			}
 			return resource.NonRetryableError(err)
 		}
+		d.SetId(resp.Email)
 		d.Set("type",resp.Type)
 		d.Set("email",resp.Email)
 		d.Set("name",resp.Name)
@@ -151,11 +157,12 @@ func resourceUserUpdate(ctx context.Context,d *schema.ResourceData, m interface{
 		})
 		return diags
 	}
-	email := d.Id()
-	role := d.Get("role").(string)
+	email 	:= d.Get("email").(string)
+	role 	:= d.Get("role").(string)
+	team_id	:= d.Get("team_id").(string)
 	var err error
 	retryErr := resource.Retry(2*time.Second, func() *resource.RetryError {
-		if err = apiClient.UpdateUser(email, role); err != nil {
+		if err = apiClient.UpdateUser(email, role,  team_id); err != nil {
 			if apiClient.IsRetry(err) {
 				return resource.RetryableError(err)
 			}
@@ -176,10 +183,19 @@ func resourceUserUpdate(ctx context.Context,d *schema.ResourceData, m interface{
 func resourceUserDelete(ctx context.Context,d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	apiClient := m.(*client.Client)
-	email := d.Id()
+	if d.HasChange("email") {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "User not allowed to change email",
+			Detail:   "User not allowed to change email",
+		})
+		return diags
+	}
+	email 	:= d.Id()
+	team_id	:= d.Get("team_id").(string)
 	var err error
 	retryErr := resource.Retry(2*time.Second, func() *resource.RetryError {
-		if err = apiClient.DeleteUser(email); err != nil {
+		if err = apiClient.DeleteUser(email, team_id); err != nil {
 			if apiClient.IsRetry(err) {
 				return resource.RetryableError(err)
 			}
@@ -200,8 +216,15 @@ func resourceUserDelete(ctx context.Context,d *schema.ResourceData, m interface{
 
 func resourceUserImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData ,error) {
 	apiClient := m.(*client.Client)
+	part1, part2, err:= resourceUserParseId(d.Id())
+	if err!= nil {
+		return []*schema.ResourceData{d}, err
+	}
+	d.SetId(part1)
+	d.Set("team_id", part2)
 	email     := d.Id()
-	resp, err := apiClient.GetUser(email)
+	team_id		:= d.Get("team_id").(string)
+	resp, err := apiClient.GetUser(email, team_id)
 	if err != nil {
 		return nil, err
 	}
@@ -216,3 +239,11 @@ func resourceUserImporter(ctx context.Context, d *schema.ResourceData, m interfa
 	d.Set("state",resp.State)
 	return []*schema.ResourceData{d}, nil
 }
+
+func resourceUserParseId(id string) (string, string, error) {
+	parts := strings.SplitN(id, ":", 2)
+	if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
+	  return "", "", fmt.Errorf("unexpected format of ID (%s), expected attribute1:attribute2", id)
+	}
+	return parts[0], parts[1], nil
+  }

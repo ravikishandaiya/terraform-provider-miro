@@ -14,8 +14,9 @@ func TestAccItem_Basic(t *testing.T) {
 			{
 				Config: testAccCheckItemBasic(),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("miro_user.user1", "email", "{email"),
-					resource.TestCheckResourceAttr("miro_user.user1", "role", "member"),
+					resource.TestCheckResourceAttr("miro_user.user1", "email", "{USER EMAIL}"),
+					resource.TestCheckResourceAttr("miro_user.user1", "role", "{USER ROLE}"),
+					resource.TestCheckResourceAttr("miro_user.user1", "team_id", "{TEAM ID}"),
 				),
 			},
 		},
@@ -25,8 +26,9 @@ func TestAccItem_Basic(t *testing.T) {
 func testAccCheckItemBasic() string {
 	return fmt.Sprintf(`
 		resource "miro_user" "user1" {
-			email	= "{email}"
-			role	= "member"
+			email	= "{USER EMAIL}"
+			role	= "{USER ROLE}"
+			team_id = "{TEAM ID}"
 		}
 	`)
 }
@@ -40,18 +42,22 @@ func TestAccItem_Update(t *testing.T) {
 				Config: testAccCheckItemUpdatePre(),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
-						"miro_user.user1", "email", "{email}"),	
+						"miro_user.user1", "email", "{USER EMAIL}"),	
 					resource.TestCheckResourceAttr(
-						"miro_user.user1", "role", "member"),
+						"miro_user.user1", "role", "{USER ROLE}"),
+					resource.TestCheckResourceAttr(
+						"miro_user.user1", "team_id", "{TEAM ID}"),
 				),
 			},
 			{
 				Config: testAccCheckItemUpdatePost(),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
-						"miro_user.user1", "email", "{email}"),	
+						"miro_user.user1", "email", "{EMAIL}"),	
 					resource.TestCheckResourceAttr(
-						"miro_user.user1", "role", "member"),
+						"miro_user.user1", "role", "{ROLE}"),
+					resource.TestCheckResourceAttr(
+						"miro_user.user1", "team_id", "{TEAM ID}"),
 				),
 			},
 		},
@@ -61,8 +67,9 @@ func TestAccItem_Update(t *testing.T) {
 func testAccCheckItemUpdatePre() string {
 	return fmt.Sprintf(`
 		resource "miro_user" "user1" {
-			email	= "{email}"
-			role	= "member"	
+			email	= "{EMAIL}"
+			role	= "{ROLE}"
+			team_id = "{TEAM ID}"
 		}
 	`)
 }
@@ -70,8 +77,9 @@ func testAccCheckItemUpdatePre() string {
 func testAccCheckItemUpdatePost() string {
 	return fmt.Sprintf(`
 		resource "miro_user" "user1" {
-			email        = "{email}"
-			role		 = "member"
+			email        = "{EMAIL}"
+			role		 = "{ROLE}"
+			team_id		 = "{TEAM ID}"
 		}
 	`)
 }

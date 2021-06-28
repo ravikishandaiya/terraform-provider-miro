@@ -27,7 +27,6 @@ type createUserResponce struct {
 
 type Client struct {
 	authToken  string
-	team_id	   string
 	httpClient *http.Client 
 }
 
@@ -85,10 +84,9 @@ func init() {
 	Errors[500] = "Internal Server Error = 500"
 } 
 
-func NewClient(token string,team_id string) *Client {
+func NewClient(token string) *Client {
 	return &Client{
 		authToken:  token,
-		team_id:	team_id,
 		httpClient: &http.Client{},
 	}
 }
@@ -122,8 +120,8 @@ func (c *Client) handleRequest(httpMethod string,url string, body []byte) (respo
 	return
 }
 
-func (c *Client) CreateUser(email string) (error) {
-	url 	  := fmt.Sprintf("https://api.miro.com/v1/teams/%s/invite", c.team_id)
+func (c *Client) CreateUser(email string, team_id string) (error) {
+	url 	  := fmt.Sprintf("https://api.miro.com/v1/teams/%s/invite", team_id)
 	payload   := createUserRequest {
 		Emails: []string {email},
 	}
@@ -145,11 +143,12 @@ func (c *Client) CreateUser(email string) (error) {
     }
 }
 
-func (c *Client) getAllTeamMembers() ([] data, []string, error) {
+func (c *Client) getAllTeamMembers(team_id string) ([] data, []string, error) {
 	var list []string
 	var ResponceStruct listAllUserResponce
-	url := fmt.Sprintf("https://api.miro.com/v1/teams/%s/user-connections?limit=100&offset=0", c.team_id)
+	url := fmt.Sprintf("https://api.miro.com/v1/teams/%s/user-connections?limit=100&offset=0", team_id)
 	resp,err := c.handleRequest(http.MethodGet, url, nil)
+
 	if err != nil {
 		return ResponceStruct.Data,list,err
 	}
@@ -197,8 +196,8 @@ func (c* Client) checkUserExist(Data []data,userIDs []string, email string) (get
 	return responceStruct, fmt.Errorf("User Not Found")
 }
 
-func (c *Client) GetUser(email string) (getUserStruct, error) {
-	Data,userIds,err := c.getAllTeamMembers()
+func (c *Client) GetUser(email string, team_id string) (getUserStruct, error) {
+	Data,userIds,err := c.getAllTeamMembers(team_id)
 	if err != nil {
 		var returnStruct getUserStruct
 		return returnStruct,err
@@ -206,8 +205,8 @@ func (c *Client) GetUser(email string) (getUserStruct, error) {
 	return c.checkUserExist(Data,userIds, email)
 }
 
-func (c *Client) Get_User_ID(email string) (user_id string, err error) {
-	Data,userIds,err := c.getAllTeamMembers()
+func (c *Client) Get_User_ID(email string, team_id string) (user_id string, err error) {
+	Data,userIds,err := c.getAllTeamMembers(team_id)
 	if err != nil {
 		return
 	}
@@ -219,11 +218,11 @@ func (c *Client) Get_User_ID(email string) (user_id string, err error) {
 	return
 }
 
-func (c *Client) UpdateUser(email string, role string) (error) {
+func (c *Client) UpdateUser(email string, role string, team_id string) (error) {
 	payload := update{
 		Role: role,
 	}
-	user_id, err := c.Get_User_ID(email)
+	user_id, err := c.Get_User_ID(email, team_id)
 	if err != nil {
 		return err
 	}
@@ -239,8 +238,8 @@ func (c *Client) UpdateUser(email string, role string) (error) {
 	return err
 }
 
-func (c *Client) DeleteUser(email string) (error) {
-	user_id, err := c.Get_User_ID(email)
+func (c *Client) DeleteUser(email string, team_id string) (error) {
+	user_id, err := c.Get_User_ID(email, team_id)
 	if err != nil {
 		return err
 	}
