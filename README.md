@@ -90,7 +90,7 @@ Delete the `resource` block of the user and run `terraform apply`.
 
 ### Import a User Data
 1. Write manually a resource configuration block for the User as shown in [example usage](#example-usage).
-2. Run the command `terraform import miro_user.user1 [EMAIL_ID]`
+2. Run the command `terraform import miro_user.user1 [EMAIL_ID]:[TEAM_ID]`
 3. Check for the attributes in the `.tfstate` file and fill them accordingly in resource block.
 
 ## Example Usage<a id="example-usage"></a>
@@ -107,11 +107,11 @@ terraform {
 
 provider "miro" {
   miro_token = "_REPLACE_MIRO_TOKEN"
-  miro_team_id = "_REPLACE_MIRO_TEAM_ID"
 }
 
 resource "miro_user" "user1" {
    email      = "demo@domain.com"
+   team_id = "_REPLACE_MIRO_TEAM_ID"
    role       = "admin"
 }
 
@@ -120,7 +120,8 @@ output "user1" {
 }
 
 data "miro_user" "user2" {
-  id = "demo@domain.com"
+  email = "demo@domain.com"
+  team_id = "_REPLACE_MIRO_TEAM_ID"
 }
 
 output "user2" {
